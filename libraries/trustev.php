@@ -43,19 +43,31 @@ class Trustev
     /**
      * This API method allows you to share authentication and access information relating to one or more social network accounts.
      * The API will create a new Trustev account for every time is invoked, unless an account already exists for any of the specified social network accounts.
-     * URL https://api.trustev.com/v1/Social/rest/AddProfile
-     * Authentication Required Yes
-     * Format JSON
-     * Method POST
+     * URL to Add https://api.trustev.com/v1/Social/rest/AddProfile
+     * URL to Add https://api.trustev.com/v1/Social/rest/UpdateProfile
+     * @param string $username
+     * @param array $credentials
+     * @param string $action // add/update
+     * @return array $result_array
      */
-    public function profile_add($username, $credentials)
+    public function profile_add($username, $credentials, $action = 'add')
     {
-        $api_url = 'https://api.trustev.com/v1/Social/rest/AddProfile';
+        $api_url = 'https://api.trustev.com/v1/Social/rest/';
+
+        $api_url = ($action == 'add') ? $api_url . 'AddProfile' : $api_url . 'UpdateProfile';
 
         $request = array(
             'Token' => $credentials["Token"],
             'UserName' => $username,
-            'SocialNetworks' => array()
+            'SocialNetworks' => array(
+                'Type' => 'SocialNetworkType',
+                'Id' => 'String',
+                'ShortTermAccessToken' => 'String',
+                'LongTermAccessToken' => 'String',
+                'ShortTermAccessTokenExpiry' => 'DateTime',
+                'LongTermAccessTokenExpiry' => 'DateTime',
+                'Secret' => 'String'
+            )
         );
 
         $json_string = json_encode(array('request' => $request));
@@ -65,19 +77,6 @@ class Trustev
         $result_array = json_decode($json_result, TRUE);
 
         return $result_array;
-    }
-
-    /**
-     * This API method allows you to update an existing Trustev account with additional social networking accounts. 
-     * This method requires that a Trustev account exists at least one of the specified social network accounts already attached
-     * URL https://api.trustev.com/v1/Social/rest/UpdateProfile
-     * Authentication Required Yes
-     * Format JSON
-     * Method POST
-     */
-    public function profile_update()
-    {
-        
     }
 
     /**
@@ -91,7 +90,24 @@ class Trustev
      */
     public function profile_delete()
     {
-        
+        $api_url = 'https://api.trustev.com/v1/Social/rest/DeleteProfile';
+
+        $request = array(
+            'Token' => $credentials["Token"],
+            'UserName' => $username,
+            'SocialNetworks' => array(
+                'Type' => 'SocialNetworkType',
+                'Id' => 'String'
+            )
+        );
+
+        $json_string = json_encode(array('request' => $request));
+
+        $json_result = $this->request($api_url, $json_string);
+
+        $result_array = json_decode($json_result, TRUE);
+
+        return $result_array;
     }
 
     /**
