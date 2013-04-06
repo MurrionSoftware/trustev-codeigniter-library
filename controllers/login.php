@@ -25,17 +25,22 @@ class Login extends CI_Controller
         $secret = $this->config->item('trustev_secret');
         $api_url = $this->config->item('trustev_endpoint');
 
-        $result_array = $this->trustev->get_token($username, $password, $secret, $api_url);
+        $credentials = $this->trustev->get_token($username, $password, $secret, $api_url);
 
-        if (is_array($result_array) && $result_array['Code'] == 200 && $result_array['Message'] == 'Success')
+        if (is_array($credentials) && $credentials['Code'] == 200 && $credentials['Message'] == 'Success')
         {
             echo "Logged in Successfully<br />";
-            print_r($result_array["Token"]);
+
+            print_r($credentials["Token"]);
+
+            $profile_add = $this->trustev->profile_add($username, $credentials);
+
+            print_r($profile_add);
         }
         else
         {
             echo "Failed to log in<br />";
-            print_r($result_array);
+            print_r($credentials);
         }
     }
 

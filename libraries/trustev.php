@@ -33,18 +33,7 @@ class Trustev
 
         $json_string = json_encode(array('request' => $request));
 
-        $ch = curl_init($api_url);
-
-        // Configuring curl options
-        $options = array(
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => array('Content-type: application/json'),
-            CURLOPT_POSTFIELDS => $json_string
-        );
-
-        curl_setopt_array($ch, $options);
-
-        $json_result = curl_exec($ch); // Getting jSON result string
+        $json_result = $this->request($api_url, $json_string);
 
         $result_array = json_decode($json_result, TRUE);
 
@@ -59,9 +48,23 @@ class Trustev
      * Format JSON
      * Method POST
      */
-    public function profile_add()
+    public function profile_add($username, $credentials)
     {
-        
+        $api_url = 'https://api.trustev.com/v1/Social/rest/AddProfile';
+
+        $request = array(
+            'Token' => $credentials["Token"],
+            'UserName' => $username,
+            'SocialNetworks' => array()
+        );
+
+        $json_string = json_encode(array('request' => $request));
+
+        $json_result = $this->request($api_url, $json_string);
+
+        $result_array = json_decode($json_result, TRUE);
+
+        return $result_array;
     }
 
     /**
@@ -100,6 +103,30 @@ class Trustev
     {
         $resultBytes = hash('sha256', $unhashed);
         return $resultBytes;
+    }
+
+    /**
+     * Perform the actual Curl request
+     * @param type $api_url
+     * @param type $json_string
+     * @return type
+     */
+    public function request($api_url, $json_string)
+    {
+        $ch = curl_init($api_url);
+
+        // Configuring curl options
+        $options = array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array('Content-type: application/json'),
+            CURLOPT_POSTFIELDS => $json_string
+        );
+
+        curl_setopt_array($ch, $options);
+
+        $json_result = curl_exec($ch);
+
+        return $json_result;
     }
 
 }
